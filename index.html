@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Mời Online</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased selection:bg-rose-100 selection:text-rose-900">
+
+    <!-- Audio Player Background -->
+    <audio id="bg-music" loop>
+        <source id="music-source" src="" type="audio/mpeg">
+    </audio>
+
+    <!-- Nút Bật/Tắt Nhạc -->
+    <div id="music-control" class="fixed bottom-6 right-6 z-50 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-lg border border-stone-200 cursor-pointer hidden items-center justify-center transition-all hover:scale-110">
+        <svg id="music-icon" class="w-6 h-6 text-rose-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+        </svg>
+    </div>
+
+    <!-- Màn hình chào / Mở thiệp -->
+    <div id="welcome-screen" class="fixed inset-0 z-50 bg-stone-900 text-white flex flex-col items-center justify-center p-6 text-center transition-opacity duration-700">
+        <div class="max-w-md space-y-6">
+            <p class="text-sm tracking-widest uppercase text-rose-300">Trân trọng kính mời</p>
+            <h1 id="welcome-title" class="serif-font text-4xl md:text-5xl font-medium tracking-wide">Hoàng Sơn & Hương Giang</h1>
+            <div class="w-16 h-px bg-rose-400 mx-auto"></div>
+            <p class="text-stone-300 text-sm">Đến tham dự lễ thành hôn của chúng tôi</p>
+            <button onclick="openInvitation()" class="mt-4 px-8 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-full uppercase tracking-wider text-sm transition-all shadow-lg hover:shadow-rose-600/30">
+                Mở Thiệp Mời
+            </button>
+        </div>
+    </div>
+
+    <!-- Nội dung chính của thiệp -->
+    <main class="max-w-xl mx-auto min-h-screen bg-white shadow-2xl overflow-hidden relative">
+        
+        <!-- Hero Section -->
+        <div class="relative h-[80vh] w-full">
+            <img id="banner-img" src="" alt="Banner" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-transparent to-black/30"></div>
+            <div class="absolute bottom-10 left-0 right-0 text-center text-white px-6 space-y-3">
+                <p class="text-xs tracking-[0.2em] uppercase text-rose-300">The Wedding Of</p>
+                <h1 id="main-title" class="serif-font text-4xl md:text-5xl font-normal">Hoàng Sơn & Hương Giang</h1>
+                <p id="main-date-text" class="text-sm tracking-widest text-stone-200"></p>
+            </div>
+        </div>
+
+        <!-- Lời ngỏ -->
+        <section class="py-16 px-8 text-center space-y-6 bg-stone-50/50">
+            <div class="w-8 h-8 mx-auto text-rose-500">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <h2 class="serif-font text-2xl text-stone-700">Lời Ngỏ</h2>
+            <p id="invitation-msg" class="text-stone-600 text-sm leading-relaxed max-w-md mx-auto italic"></p>
+            <div class="pt-6 grid grid-cols-2 gap-4 max-w-xs mx-auto text-center">
+                <div class="p-4 border border-stone-200 rounded-lg bg-white shadow-sm">
+                    <p class="text-xs text-stone-400 uppercase">Chú Rể</p>
+                    <p id="groom-label" class="serif-font text-lg font-medium text-rose-800 mt-1"></p>
+                </div>
+                <div class="p-4 border border-stone-200 rounded-lg bg-white shadow-sm">
+                    <p class="text-xs text-stone-400 uppercase">Cô Dâu</p>
+                    <p id="bride-label" class="serif-font text-lg font-medium text-rose-800 mt-1"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Đếm ngược thời gian -->
+        <section class="py-12 px-6 bg-stone-900 text-white text-center">
+            <h2 class="serif-font text-xl tracking-wider text-rose-300 mb-6 uppercase">Đếm Ngược Ngày Cưới</h2>
+            <div class="grid grid-cols-4 gap-3 max-w-md mx-auto">
+                <div class="bg-stone-800 p-3 rounded-lg border border-stone-700">
+                    <span id="days" class="serif-font text-2xl block font-bold text-rose-400">00</span>
+                    <span class="text-[10px] text-stone-400 uppercase tracking-widest">Ngày</span>
+                </div>
+                <div class="bg-stone-800 p-3 rounded-lg border border-stone-700">
+                    <span id="hours" class="serif-font text-2xl block font-bold text-rose-400">00</span>
+                    <span class="text-[10px] text-stone-400 uppercase tracking-widest">Giờ</span>
+                </div>
+                <div class="bg-stone-800 p-3 rounded-lg border border-stone-700">
+                    <span id="minutes" class="serif-font text-2xl block font-bold text-rose-400">00</span>
+                    <span class="text-[10px] text-stone-400 uppercase tracking-widest">Phút</span>
+                </div>
+                <div class="bg-stone-800 p-3 rounded-lg border border-stone-700">
+                    <span id="seconds" class="serif-font text-2xl block font-bold text-rose-400">00</span>
+                    <span class="text-[10px] text-stone-400 uppercase tracking-widest">Giây</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Địa điểm & Hộp mừng cưới -->
+        <section class="py-16 px-8 space-y-12">
+            <!-- Địa điểm -->
+            <div class="text-center space-y-4">
+                <h2 class="serif-font text-2xl text-stone-700">Địa Điểm Tổ Chức</h2>
+                <div class="p-6 bg-stone-50 rounded-xl border border-stone-200 space-y-2">
+                    <h3 id="location-name" class="font-semibold text-rose-800 text-lg"></h3>
+                    <p id="location-address" class="text-sm text-stone-600"></p>
+                </div>
+            </div>
+
+            <!-- Mừng cưới / QR Code -->
+            <div class="text-center space-y-4 pt-4 border-t border-stone-100">
+                <h2 class="serif-font text-2xl text-stone-700">Hộp Mừng Cưới</h2>
+                <p class="text-xs text-stone-500">Gửi lời chúc phúc và mừng cưới đến cô dâu chú rể</p>
+                
+                <div class="inline-block p-6 bg-white border border-stone-200 rounded-2xl shadow-md space-y-3 max-w-xs mx-auto">
+                    <img id="qr-code" src="" alt="QR Code" class="w-48 h-48 mx-auto object-contain rounded-lg">
+                    <div class="text-left text-xs space-y-1 pt-2 border-t border-stone-100">
+                        <p>Ngân hàng: <span id="bank-name" class="font-semibold"></span></p>
+                        <p>Số tài khoản: <span id="bank-acc" class="font-semibold text-rose-700"></span></p>
+                        <p>Chủ tài khoản: <span id="bank-owner" class="font-semibold"></span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-8 bg-stone-900 text-stone-400 text-center text-xs tracking-wider">
+            <p>© 2026 Wedding Invitation</p>
+            <p id="footer-names" class="mt-1 text-rose-300 font-medium"></p>
+        </footer>
+
+    </main>
+
+    <!-- Import file config -->
+    <script src="config.js"></script>
+    <script>
+        // Nạp dữ liệu từ config.js vào giao diện
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof SITE_CONFIG === 'undefined') return;
+
+            document.title = SITE_CONFIG.eventTitle;
+            document.getElementById('welcome-title').innerText = SITE_CONFIG.eventTitle;
+            document.getElementById('main-title').innerText = SITE_CONFIG.eventTitle;
+            document.getElementById('banner-img').src = SITE_CONFIG.bannerImage;
+            document.getElementById('invitation-msg').innerText = SITE_CONFIG.invitationMessage;
+            document.getElementById('groom-label').innerText = SITE_CONFIG.groomName;
+            document.getElementById('bride-label').innerText = SITE_CONFIG.brideName;
+            document.getElementById('location-name').innerText = SITE_CONFIG.locationName;
+            document.getElementById('location-address').innerText = SITE_CONFIG.locationAddress;
+            
+            document.getElementById('bank-name').innerText = SITE_CONFIG.bankInfo.bankName;
+            document.getElementById('bank-acc').innerText = SITE_CONFIG.bankInfo.accountNumber;
+            document.getElementById('bank-owner').innerText = SITE_CONFIG.bankInfo.accountOwner;
+            document.getElementById('qr-code').src = SITE_CONFIG.bankInfo.qrCodeUrl;
+            document.getElementById('footer-names').innerText = `${SITE_CONFIG.groomName} & ${SITE_CONFIG.brideName}`;
+
+            // Format ngày tháng hiển thị
+            const eventDateObj = new Date(SITE_CONFIG.eventDate);
+            const dateStr = `Ngày ${eventDateObj.getDate()} Tháng ${eventDateObj.getMonth() + 1} Năm ${eventDateObj.getFullYear()}`;
+            document.getElementById('main-date-text').innerText = dateStr;
+
+            // Nhạc nền
+            document.getElementById('music-source').src = SITE_CONFIG.backgroundMusic;
+            document.getElementById('bg-music').load();
+
+            // Khởi chạy đếm ngược
+            startCountdown(SITE_CONFIG.eventDate);
+        });
+
+        // Xử lý mở thiệp & bật nhạc
+        let isPlaying = false;
+        const audio = document.getElementById('bg-music');
+        const musicControl = document.getElementById('music-control');
+
+        function openInvitation() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            welcomeScreen.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+            }, 700);
+
+            // Bật nhạc nền
+            audio.play().then(() => {
+                isPlaying = true;
+                musicControl.classList.remove('hidden');
+                musicControl.classList.add('flex');
+            }).catch(e => console.log("Autoplay blocked:", e));
+        }
+
+        // Bật/Tắt nhạc khi click icon góc màn hình
+        musicControl.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                document.getElementById('music-icon').classList.remove('animate-spin');
+                musicControl.classList.add('opacity-50');
+            } else {
+                audio.play();
+                isPlaying = true;
+                document.getElementById('music-icon').classList.add('animate-spin');
+                musicControl.classList.remove('opacity-50');
+            }
+        });
+
+        // Hàm tính thời gian đếm ngược
+        function startCountdown(dateString) {
+            const targetDate = new Date(dateString).getTime();
+
+            setInterval(() => {
+                const now = new Date().getTime();
+                const difference = targetDate - now;
+
+                if (difference > 0) {
+                    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                    document.getElementById('days').innerText = String(days).padStart(2, '0');
+                    document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+                    document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+                    document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
